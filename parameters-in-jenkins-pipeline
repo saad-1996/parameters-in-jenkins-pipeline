@@ -1,0 +1,35 @@
+pipeline {
+    agent any
+    
+    parameters {
+        choice(
+            name: 'TOMCAT_VERSION',
+            choices: ['tomcat1', 'tomcat2'],
+            description: 'Select the Tomcat version'
+        )
+    }
+    
+    stages {
+        stage('Checkout Repository') {
+            steps {
+                script {
+
+                    if (params.TOMCAT_VERSION == 'tomcat1') {
+                        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/saad-1996/tomcat-task1.git']])
+
+                        sh 'mvn clean install'
+                        sh 'mv target/onlinebookstore.war /home/hp/opt/tomcat/webapps/'
+                    } else if (params.TOMCAT_VERSION == 'tomcat2') {
+                        checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/saad-1996/tomcat-task1.git']])
+
+                        sh 'mvn clean install'
+                        sh 'mv target/onlinebookstore.war /home/hp/opt/tomcat-2/webapps/'
+                    } else {
+                        error "Invalid TOMCAT_VERSION selected"
+                    }
+                }
+            }
+        }
+
+    }
+}
